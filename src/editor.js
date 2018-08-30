@@ -187,18 +187,7 @@ class Editor {
       return v.toString(16);
     });
   }
-  log() {
-    console.log(util.inspect(this.level, false, null))
-  }
   exportLevel(path) {
     this.level.save(path);
   }
 }
-
-let editor = new Editor();
-editor.loadLevel("test.lev").then(() => {
-  let p = editor.createPicture();
-  editor.log();
-  editor.deletePicture(p);
-  editor.log();
-});
