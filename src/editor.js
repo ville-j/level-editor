@@ -117,7 +117,7 @@ class Editor {
     let p = this.level.polygons.findIndex(p => {
       return p.id === id;
     });
-    if (!p)
+    if (p < 0)
       throw ("polygon not found");
 
     return p;
@@ -135,7 +135,7 @@ class Editor {
     let p = this.level.pictures.findIndex(p => {
       return p.id === id;
     });
-    if (!p)
+    if (p < 0)
       throw ("picture not found");
 
     return p;
@@ -153,7 +153,7 @@ class Editor {
     let v = polygon.vertices.findIndex(v => {
       return v.id === id;
     });
-    if (!v)
+    if (v < 0)
       throw ("vertex not found");
 
     return v;
@@ -171,7 +171,7 @@ class Editor {
     let o = this.level.objects.findIndex(o => {
       return o.id === id;
     });
-    if (!o)
+    if (o < 0)
       throw ("object not found");
 
     return o;
@@ -197,9 +197,8 @@ class Editor {
 
 let editor = new Editor();
 editor.loadLevel("test.lev").then(() => {
+  let p = editor.createPicture();
   editor.log();
-  let p = editor.createPolygon(3, 2, 1);
-  editor.log();
-  editor.deletePolygon(p);
+  editor.deletePicture(p);
   editor.log();
 });
