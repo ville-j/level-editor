@@ -190,3 +190,5 @@ class Editor {
     this.level.save(path);
   }
 }
+
+module.exports = Editor
