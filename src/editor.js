@@ -1,5 +1,4 @@
 const Level = require("node-elma").Level;
-const util = require("util");
 
 class Editor {
   newLevel() {
