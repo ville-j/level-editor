@@ -47,20 +47,17 @@ class Editor {
     });
     return uid;
   }
-  createVertex(x, y, polygon, pos) {
-    if (!this.level.polygons[polygon])
-      throw "polygon not found";
-
+  createVertex(x, y, polygon, index) {
     const uid = this.uuidv4();
 
-    if (pos >= 0) {
-      this.level.polygons[polygon].vertices.splice(pos, 0, {
+    if (index >= 0) {
+      polygon.vertices.splice(index, 0, {
         id: uid,
         x: x,
         y: y
       });
     } else {
-      this.level.polygons[polygon].vertices.push({
+      polygon.vertices.push({
         id: uid,
         x: x,
         y: y
@@ -81,14 +78,25 @@ class Editor {
     });
     return uid;
   }
-  deleteVertex(polygon, pos) {
-    if (!this.level.polygons[polygon])
-      throw "polygon not found";
-
-    if (!this.level.polygons[polygon].vertices[pos])
-      throw "polygon not found";
-
-    this.level.polygons[polygon].vertices.splice(pos, 1);
+  createPicture(name, texture, mask, x, y, distance, clip) {
+    const uid = this.uuidv4();
+    this.level.pictures.push({
+      id: uid,
+      name: name,
+      texture: texture,
+      mask: mask,
+      x: x,
+      y: y,
+      distance: distance,
+      clip: clip
+    });
+    return uid;
+  }
+  deletePicture(id) {
+    this.level.pictures.splice(this.findPictureIndex(id), 1);
+  }
+  deleteVertex(polygon, id) {
+    polygon.vertices.splice(this.findVertexIndex(id), 1);
   }
   deletePolygon(id) {
     this.level.polygons.splice(this.findPolygonIndex(id), 1);
@@ -111,6 +119,24 @@ class Editor {
     });
     if (!p)
       throw ("polygon not found");
+
+    return p;
+  }
+  findPicture(id) {
+    let p = this.level.pictures.find(p => {
+      return p.id === id;
+    });
+    if (!p)
+      throw ("picture not found");
+
+    return p;
+  }
+  findPictureIndex(id) {
+    let p = this.level.pictures.findIndex(p => {
+      return p.id === id;
+    });
+    if (!p)
+      throw ("picture not found");
 
     return p;
   }
