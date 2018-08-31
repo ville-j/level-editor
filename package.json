@@ -2,7 +2,7 @@
   "name": "level-editor",
   "version": "1.0.0",
   "description": "Elasto Mania level editor",
-  "main": "index.js",
+  "main": "src/editor.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
