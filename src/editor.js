@@ -33,16 +33,15 @@ class Editor {
   setName(name) {
     this.level.name = name;
   }
-  createPolygon(x, y, grass) {
+  createPolygon(vertices, grass) {
     const uid = this.uuidv4();
+    vertices.map(v => {
+      v.id = this.uuidv4()
+    });
     this.level.polygons.push({
       id: uid,
       grass: grass || false,
-      vertices: [{
-        id: this.uuidv4(),
-        x: x,
-        y: y
-      }]
+      vertices: vertices
     });
     return uid;
   }
@@ -50,7 +49,7 @@ class Editor {
     const uid = this.uuidv4();
 
     if (afterVertexId) {
-      polygon.vertices.splice(polygon.vertices.findVertexIndex(afterVertexId) + 1, 0, {
+      polygon.vertices.splice(this.findVertexIndex(afterVertexId, polygon) + 1, 0, {
         id: uid,
         x: x,
         y: y
@@ -95,7 +94,7 @@ class Editor {
     this.level.pictures.splice(this.findPictureIndex(id), 1);
   }
   deleteVertex(polygon, id) {
-    polygon.vertices.splice(this.findVertexIndex(id), 1);
+    polygon.vertices.splice(this.findVertexIndex(id, polygon), 1);
   }
   deletePolygon(id) {
     this.level.polygons.splice(this.findPolygonIndex(id), 1);
