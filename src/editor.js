@@ -45,11 +45,11 @@ class Editor {
     });
     return uid;
   }
-  createVertex(x, y, polygon, afterVertexId) {
+  createVertex(x, y, polygon, afterVertexId, direction) {
     const uid = this.uuidv4();
 
     if (afterVertexId) {
-      polygon.vertices.splice(this.findVertexIndex(afterVertexId, polygon) + 1, 0, {
+      polygon.vertices.splice(this.findVertexIndex(afterVertexId, polygon) + direction, 0, {
         id: uid,
         x: x,
         y: y
