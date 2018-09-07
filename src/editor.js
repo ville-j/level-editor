@@ -38,47 +38,45 @@ class Editor {
     vertices.map(v => {
       v.id = this.uuidv4()
     });
-    this.level.polygons.push({
+    let p = {
       id: uid,
       grass: grass || false,
       vertices: vertices
-    });
-    return uid;
+    };
+    this.level.polygons.push(p);
+    return p;
   }
   createVertex(x, y, polygon, afterVertexId, direction) {
     const uid = this.uuidv4();
+    let v = {
+      id: uid,
+      x: x,
+      y: y
+    };
 
     if (afterVertexId) {
-      polygon.vertices.splice(this.findVertexIndex(afterVertexId, polygon) + direction, 0, {
-        id: uid,
-        x: x,
-        y: y
-      });
+      polygon.vertices.splice(this.findVertexIndex(afterVertexId, polygon) + direction, 0, v);
     } else {
-      polygon.vertices.push({
-        id: uid,
-        x: x,
-        y: y
-      });
+      polygon.vertices.push(v);
     }
-
-    return uid;
+    return v;
   }
   createObject(x, y, type, gravity, animation) {
     const uid = this.uuidv4();
-    this.level.objects.push({
+    let o = {
       id: uid,
       x: x,
       y: y,
       type: type,
       gravity: gravity,
       animation: animation
-    });
-    return uid;
+    };
+    this.level.objects.push(o);
+    return o;
   }
   createPicture(name, texture, mask, x, y, distance, clip) {
     const uid = this.uuidv4();
-    this.level.pictures.push({
+    let p = {
       id: uid,
       name: name,
       texture: texture,
@@ -87,8 +85,9 @@ class Editor {
       y: y,
       distance: distance,
       clip: clip
-    });
-    return uid;
+    };
+    this.level.pictures.push(p);
+    return p;
   }
   deletePicture(id) {
     this.level.pictures.splice(this.findPictureIndex(id), 1);
