@@ -44,7 +44,24 @@ class Editor {
       vertices: vertices
     };
     this.level.polygons.push(p);
+
+    if (this._connected) {
+      this._socket.emit("createpolygon", p);
+    }
+
     return p;
+  }
+  updateVertex(vertex, polygon, x, y) {
+    vertex.x = x;
+    vertex.y = y;
+    if (this._connected) {
+      this._socket.emit("updatevertex", {
+        id: vertex.id,
+        polygonId: polygon.id,
+        x,
+        y
+      });
+    }
   }
   createVertex(x, y, polygon, afterVertexId, direction) {
     const uid = this.uuidv4();
@@ -58,6 +75,17 @@ class Editor {
       polygon.vertices.splice(this.findVertexIndex(afterVertexId, polygon) + direction, 0, v);
     } else {
       polygon.vertices.push(v);
+    }
+
+    if (this._connected) {
+      this._socket.emit("createvertex", {
+        id: uid,
+        x,
+        y,
+        polygonId: polygon.id,
+        afterVertexId,
+        direction
+      });
     }
     return v;
   }
@@ -94,9 +122,18 @@ class Editor {
   }
   deleteVertex(polygon, id) {
     polygon.vertices.splice(this.findVertexIndex(id, polygon), 1);
+
+    if (this._connected)
+      this._socket.emit("deletevertex", {
+        id: id,
+        polygonId: polygon.id
+      });
   }
   deletePolygon(id) {
     this.level.polygons.splice(this.findPolygonIndex(id), 1);
+
+    if (this._connected)
+      this._socket.emit("deletepolygon", id);
   }
   deleteObject(id) {
     this.level.objects.splice(this.findObjectIndex(id), 1);
@@ -178,14 +215,45 @@ class Editor {
    * https://stackoverflow.com/a/2117523
    */
   uuidv4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
       var r = Math.random() * 16 | 0,
-        v = c == 'x' ? r : (r & 0x3 | 0x8);
+        v = c == "x" ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
   }
   exportLevel(path) {
     this.level.save(path);
+  }
+  connect() {
+    const io = require("socket.io-client");
+    this._socket = io("http://localhost:3123");
+    this._socket.on("connect", () => {
+      this._connected = true;
+    });
+    this._socket.on("createvertex", (v) => {
+      let polygon = this.findPolygon(v.polygonId);
+
+      if (v.afterVertexId) {
+        polygon.vertices.splice(this.findVertexIndex(v.afterVertexId, polygon) + v.direction, 0, v);
+      } else {
+        polygon.vertices.push(v);
+      }
+    });
+    this._socket.on("createpolygon", (p) => {
+      this.level.polygons.push(p);
+    });
+    this._socket.on("deletevertex", (v) => {
+      let polygon = this.findPolygon(v.polygonId);
+      polygon.vertices.splice(this.findVertexIndex(v.id, polygon), 1);
+    });
+    this._socket.on("updatevertex", (v) => {
+      let vertex = this.findVertex(v.id, this.findPolygon(v.polygonId));
+      vertex.x = v.x;
+      vertex.y = v.y;
+    });
+    this._socket.on("deletepolygon", (p) => {
+      this.level.polygons.splice(this.findPolygonIndex(p), 1);
+    });
   }
 }
 
