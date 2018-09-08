@@ -224,9 +224,9 @@ class Editor {
   exportLevel(path) {
     this.level.save(path);
   }
-  connect() {
+  connect(server) {
     const io = require("socket.io-client");
-    this._socket = io("http://localhost:3123");
+    this._socket = io(server);
     this._socket.on("connect", () => {
       this._connected = true;
     });
