@@ -111,6 +111,10 @@ class Editor {
       animation: animation
     };
     this.level.objects.push(o);
+
+    if (this._connected) {
+      this._socket.emit("createobject", o);
+    }
     return o;
   }
   createPicture(name, texture, mask, x, y, distance, clip) {
@@ -252,6 +256,9 @@ class Editor {
     });
     this._socket.on("createpolygon", (p) => {
       this.level.polygons.push(p);
+    });
+    this._socket.on("createobject", (o) => {
+      this.level.objects.push(o);
     });
     this._socket.on("deletevertex", (v) => {
       let polygon = this.findPolygon(v.polygonId);
