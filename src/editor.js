@@ -63,6 +63,17 @@ class Editor {
       });
     }
   }
+  updateObject(obj, x, y) {
+    obj.x = x;
+    obj.y = y;
+    if (this._connected) {
+      this._socket.emit("updateobject", {
+        id: obj.id,
+        x,
+        y
+      });
+    }
+  }
   createVertex(x, y, polygon, afterVertexId, direction) {
     const uid = this.uuidv4();
     let v = {
@@ -250,6 +261,11 @@ class Editor {
       let vertex = this.findVertex(v.id, this.findPolygon(v.polygonId));
       vertex.x = v.x;
       vertex.y = v.y;
+    });
+    this._socket.on("updateobject", (o) => {
+      let obj = this.findObject(o.id);
+      obj.x = o.x;
+      obj.y = o.y;
     });
     this._socket.on("deletepolygon", (p) => {
       this.level.polygons.splice(this.findPolygonIndex(p), 1);
