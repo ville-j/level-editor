@@ -152,6 +152,9 @@ class Editor {
   }
   deleteObject(id) {
     this.level.objects.splice(this.findObjectIndex(id), 1);
+
+    if (this._connected)
+      this._socket.emit("deleteobject", id);
   }
   findPolygon(id) {
     let p = this.level.polygons.find(p => {
@@ -276,6 +279,9 @@ class Editor {
     });
     this._socket.on("deletepolygon", (p) => {
       this.level.polygons.splice(this.findPolygonIndex(p), 1);
+    });
+    this._socket.on("deleteobject", (o) => {
+      this.level.objects.splice(this.findObjectIndex(o), 1);
     });
   }
 }
