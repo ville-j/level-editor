@@ -242,6 +242,9 @@ class Editor {
   exportLevel(path) {
     this.level.save(path);
   }
+  createBinary() {
+    return this.level.toBuffer();
+  }
   connect(server) {
     const io = require("socket.io-client");
     this._socket = io(server);
