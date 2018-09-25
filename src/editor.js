@@ -245,6 +245,11 @@ class Editor {
   createBinary() {
     return this.level.toBuffer();
   }
+  joinRoom(room) {
+    if (!this._connected)
+      throw "client is not connected to a server";
+    this._socket.emit("joinroom", room);
+  }
   connect(server) {
     const io = require("socket.io-client");
     this._socket = io(server);
@@ -285,6 +290,15 @@ class Editor {
     });
     this._socket.on("deleteobject", (o) => {
       this.level.objects.splice(this.findObjectIndex(o), 1);
+    });
+    this._socket.on("requestlevel", (clientId) => {
+      this._socket.emit("responselevel", {
+        level: this.level,
+        clientId: clientId
+      });
+    });
+    this._socket.on("responselevel", (l) => {
+      this.level = l;
     });
   }
 }
