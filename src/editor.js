@@ -298,7 +298,10 @@ class Editor {
       });
     });
     this._socket.on("responselevel", (l) => {
-      this.level = l;
+      let level = new Level();
+      level.polygons = l.polygons;
+      level.objects = l.objects;
+      this.level = level;
     });
   }
 }
