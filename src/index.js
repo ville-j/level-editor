@@ -1,6 +1,6 @@
 const Level = require("node-elma").Level;
 
-class Editor {
+class LevelEditor {
   newLevel() {
     this.initLevel(new Level());
   }
@@ -36,7 +36,7 @@ class Editor {
   createPolygon(vertices, grass) {
     const uid = this.uuidv4();
     vertices.map(v => {
-      v.id = this.uuidv4()
+      v.id = this.uuidv4();
     });
     let p = {
       id: uid,
@@ -83,7 +83,11 @@ class Editor {
     };
 
     if (afterVertexId) {
-      polygon.vertices.splice(this.findVertexIndex(afterVertexId, polygon) + direction, 0, v);
+      polygon.vertices.splice(
+        this.findVertexIndex(afterVertexId, polygon) + direction,
+        0,
+        v
+      );
     } else {
       polygon.vertices.push(v);
     }
@@ -147,21 +151,18 @@ class Editor {
   deletePolygon(id) {
     this.level.polygons.splice(this.findPolygonIndex(id), 1);
 
-    if (this._connected)
-      this._socket.emit("deletepolygon", id);
+    if (this._connected) this._socket.emit("deletepolygon", id);
   }
   deleteObject(id) {
     this.level.objects.splice(this.findObjectIndex(id), 1);
 
-    if (this._connected)
-      this._socket.emit("deleteobject", id);
+    if (this._connected) this._socket.emit("deleteobject", id);
   }
   findPolygon(id) {
     let p = this.level.polygons.find(p => {
       return p.id === id;
     });
-    if (!p)
-      throw ("polygon not found");
+    if (!p) throw "polygon not found";
 
     return p;
   }
@@ -169,8 +170,7 @@ class Editor {
     let p = this.level.polygons.findIndex(p => {
       return p.id === id;
     });
-    if (p < 0)
-      throw ("polygon not found");
+    if (p < 0) throw "polygon not found";
 
     return p;
   }
@@ -178,8 +178,7 @@ class Editor {
     let p = this.level.pictures.find(p => {
       return p.id === id;
     });
-    if (!p)
-      throw ("picture not found");
+    if (!p) throw "picture not found";
 
     return p;
   }
@@ -187,8 +186,7 @@ class Editor {
     let p = this.level.pictures.findIndex(p => {
       return p.id === id;
     });
-    if (p < 0)
-      throw ("picture not found");
+    if (p < 0) throw "picture not found";
 
     return p;
   }
@@ -196,8 +194,7 @@ class Editor {
     let v = polygon.vertices.find(v => {
       return v.id === id;
     });
-    if (!v)
-      throw ("vertex not found");
+    if (!v) throw "vertex not found";
 
     return v;
   }
@@ -205,8 +202,7 @@ class Editor {
     let v = polygon.vertices.findIndex(v => {
       return v.id === id;
     });
-    if (v < 0)
-      throw ("vertex not found");
+    if (v < 0) throw "vertex not found";
 
     return v;
   }
@@ -214,8 +210,7 @@ class Editor {
     let o = this.level.objects.find(o => {
       return o.id === id;
     });
-    if (!o)
-      throw ("object not found");
+    if (!o) throw "object not found";
 
     return o;
   }
@@ -223,8 +218,7 @@ class Editor {
     let o = this.level.objects.findIndex(o => {
       return o.id === id;
     });
-    if (o < 0)
-      throw ("object not found");
+    if (o < 0) throw "object not found";
 
     return o;
   }
@@ -233,9 +227,9 @@ class Editor {
    * https://stackoverflow.com/a/2117523
    */
   uuidv4() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-      var r = Math.random() * 16 | 0,
-        v = c == "x" ? r : (r & 0x3 | 0x8);
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+      var r = (Math.random() * 16) | 0,
+        v = c == "x" ? r : (r & 0x3) | 0x8;
       return v.toString(16);
     });
   }
@@ -246,8 +240,7 @@ class Editor {
     return this.level.toBuffer();
   }
   joinRoom(room) {
-    if (!this._connected)
-      throw "client is not connected to a server";
+    if (!this._connected) throw "client is not connected to a server";
     this._socket.emit("joinroom", room);
   }
   connect(server) {
@@ -256,48 +249,52 @@ class Editor {
     this._socket.on("connect", () => {
       this._connected = true;
     });
-    this._socket.on("createvertex", (v) => {
+    this._socket.on("createvertex", v => {
       let polygon = this.findPolygon(v.polygonId);
 
       if (v.afterVertexId) {
-        polygon.vertices.splice(this.findVertexIndex(v.afterVertexId, polygon) + v.direction, 0, v);
+        polygon.vertices.splice(
+          this.findVertexIndex(v.afterVertexId, polygon) + v.direction,
+          0,
+          v
+        );
       } else {
         polygon.vertices.push(v);
       }
     });
-    this._socket.on("createpolygon", (p) => {
+    this._socket.on("createpolygon", p => {
       this.level.polygons.push(p);
     });
-    this._socket.on("createobject", (o) => {
+    this._socket.on("createobject", o => {
       this.level.objects.push(o);
     });
-    this._socket.on("deletevertex", (v) => {
+    this._socket.on("deletevertex", v => {
       let polygon = this.findPolygon(v.polygonId);
       polygon.vertices.splice(this.findVertexIndex(v.id, polygon), 1);
     });
-    this._socket.on("updatevertex", (v) => {
+    this._socket.on("updatevertex", v => {
       let vertex = this.findVertex(v.id, this.findPolygon(v.polygonId));
       vertex.x = v.x;
       vertex.y = v.y;
     });
-    this._socket.on("updateobject", (o) => {
+    this._socket.on("updateobject", o => {
       let obj = this.findObject(o.id);
       obj.x = o.x;
       obj.y = o.y;
     });
-    this._socket.on("deletepolygon", (p) => {
+    this._socket.on("deletepolygon", p => {
       this.level.polygons.splice(this.findPolygonIndex(p), 1);
     });
-    this._socket.on("deleteobject", (o) => {
+    this._socket.on("deleteobject", o => {
       this.level.objects.splice(this.findObjectIndex(o), 1);
     });
-    this._socket.on("requestlevel", (clientId) => {
+    this._socket.on("requestlevel", clientId => {
       this._socket.emit("responselevel", {
         level: this.level,
         clientId: clientId
       });
     });
-    this._socket.on("responselevel", (l) => {
+    this._socket.on("responselevel", l => {
       let level = new Level();
       level.polygons = l.polygons;
       level.objects = l.objects;
@@ -306,4 +303,4 @@ class Editor {
   }
 }
 
-module.exports = Editor
+module.exports = LevelEditor;

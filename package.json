@@ -2,15 +2,20 @@
   "name": "level-editor",
   "version": "1.0.0",
   "description": "Elasto Mania level editor",
-  "main": "src/editor.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d lib"
   },
   "author": "Ville Jänkälä",
   "license": "ISC",
   "dependencies": {
-    "eslint": "^5.4.0",
     "node-elma": "^1.0.2",
     "socket.io-client": "^2.1.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0"
   }
 }
