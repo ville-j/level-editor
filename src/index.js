@@ -233,6 +233,47 @@ class LevelEditor {
       return v.toString(16);
     });
   }
+  pointInPolygon(x, y, vertices) {
+    let inside = false;
+    for (var i = 0, j = vertices.length - 1; i < vertices.length; j = i++) {
+      var xi = vertices[i].x,
+        yi = vertices[i].y;
+      var xj = vertices[j].x,
+        yj = vertices[j].y;
+
+      var intersect =
+        yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+      if (intersect) inside = !inside;
+    }
+
+    return inside;
+  }
+  isPolygonClockwise(polygon) {
+    let sum = 0;
+    for (let i = 0; i < polygon.vertices.length - 1; i++) {
+      let current = polygon.vertices[i];
+      let next =
+        polygon.vertices[i + 1 === polygon.vertices.length ? 0 : i + 1];
+      sum += (next.x - current.x) * (next.y + current.y);
+    }
+    return sum > 0;
+  }
+  shouldPolygonBeGround(polygon) {
+    let i = 0;
+    this.level.polygons.map(pp => {
+      if (pp.id !== polygon.id) {
+        if (
+          this.pointInPolygon(
+            polygon.vertices[0].x,
+            polygon.vertices[0].y,
+            pp.vertices
+          )
+        )
+          i++;
+      }
+    });
+    return i % 2 !== 0;
+  }
   exportLevel(path) {
     this.level.save(path);
   }
