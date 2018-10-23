@@ -1,4 +1,4 @@
-const Level = require("node-elma").Level;
+const Level = require("../lib/node-elma").Level;
 
 class LevelEditor {
   newLevel() {
