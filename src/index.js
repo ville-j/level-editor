@@ -250,7 +250,7 @@ class LevelEditor {
   }
   isPolygonClockwise(polygon) {
     let sum = 0;
-    for (let i = 0; i < polygon.vertices.length - 1; i++) {
+    for (let i = 0; i < polygon.vertices.length; i++) {
       let current = polygon.vertices[i];
       let next =
         polygon.vertices[i + 1 === polygon.vertices.length ? 0 : i + 1];
@@ -278,7 +278,16 @@ class LevelEditor {
     this.level.save(path);
   }
   createBinary() {
-    return this.level.toBuffer();
+    let l = new Level();
+    l.objects = this.level.objects;
+    l.polygons = this.level.polygons.map(p => {
+      let pol = { ...p };
+      if (this.shouldPolygonBeGround(p) !== this.isPolygonClockwise(p)) {
+        pol.vertices = pol.vertices.slice(0).reverse();
+      }
+      return pol;
+    });
+    return l.toBuffer();
   }
   joinRoom(room) {
     if (!this._connected) throw "client is not connected to a server";
