@@ -296,8 +296,16 @@ class LevelEditor {
   connect(server) {
     const io = require("socket.io-client");
     this._socket = io(server);
+    this.onConnectionStatusChange &&
+      this.onConnectionStatusChange("connecting");
+    this._socket.on("reconnect_attempt", () => {
+      this.onConnectionStatusChange &&
+        this.onConnectionStatusChange("reconnecting");
+    });
     this._socket.on("connect", () => {
       this._connected = true;
+      this.onConnectionStatusChange &&
+        this.onConnectionStatusChange("connected");
     });
     this._socket.on("createvertex", v => {
       let polygon = this.findPolygon(v.polygonId);
