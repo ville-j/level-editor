@@ -1,6 +1,9 @@
 const Level = require("../lib/node-elma").Level;
 
 class LevelEditor {
+  constructor() {
+    this.serverRooms = [];
+  }
   newLevel() {
     this.initLevel(new Level());
   }
@@ -289,9 +292,9 @@ class LevelEditor {
     });
     return l.toBuffer();
   }
-  joinRoom(room) {
+  joinRoom(name, password) {
     if (!this._connected) throw "client is not connected to a server";
-    this._socket.emit("joinroom", room);
+    this._socket.emit("joinroom", { name: name, password: password });
   }
   connect(server) {
     const io = require("socket.io-client");
@@ -306,6 +309,12 @@ class LevelEditor {
       this._connected = true;
       this.onConnectionStatusChange &&
         this.onConnectionStatusChange("connected");
+
+      this._socket.emit("listrooms");
+    });
+    this._socket.on("listrooms", r => {
+      this.serverRooms = r;
+      this.onServerRoomsChange && this.onServerRoomsChange(this.serverRooms);
     });
     this._socket.on("createvertex", v => {
       let polygon = this.findPolygon(v.polygonId);
